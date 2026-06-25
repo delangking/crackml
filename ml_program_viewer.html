@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Programs</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 20px;
+      }
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+      }
+      .tabs button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: #fff;
+        cursor: pointer;
+      }
+      .viewer {
+        background: #1e1e1e;
+        color: #eee;
+        border-radius: 10px;
+        padding: 16px;
+        position: relative;
+      }
+      pre {
+        white-space: pre-wrap;
+        overflow: auto;
+        margin: 0;
+        font-family: Consolas, monospace;
+      }
+      .copy {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        background: #22c55e;
+        color: #fff;
+        border: none;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>ML Programs</h2>
+    <div class="tabs">
+      <button onclick="showProg(1)">1</button>
+      <button onclick="showProg(2)">2</button>
+      <button onclick="showProg(3)">3</button>
+      <button onclick="showProg(4)">4</button>
+      <button onclick="showProg(5)">5</button>
+      <button onclick="showProg(6)">6</button>
+      <button onclick="showProg(7)">7</button>
+      <button onclick="showProg(8)">8</button>
+      <button onclick="showProg(9)">9</button>
+      <button onclick="showProg(10)">10</button>
+    </div>
+    <div class="viewer">
+      <button class="copy" onclick="copyCode()">📋 Copy</button>
+      <pre id="code"></pre>
+    </div>
+    <script>
+      const programs = {
+        1: `#program 1\nimport numpy as np\nimport seaborn as sns\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import fetch_california_housing\n\ndf = fetch_california_housing(as_frame=True).frame\nnum = df.select_dtypes(include=[np.number]).columns\n\nfor c in num:\n    sns.histplot(df[c], kde=True, bins=30)\n    plt.title(c)\n    plt.show()\n\nfor c in num:\n    sns.boxplot(x=df[c])\n    plt.title(c)\n    plt.show()\n\nprint(df.describe())\n\nfor c in num:\n    q1, q3 = df[c].quantile([0.25, 0.75])\n    iqr = q3 - q1\n    out = df[(df[c] &lt; q1 - 1.5*iqr) | (df[c] &gt; q3 + 1.5*iqr)]\n    print(c, len(out))`,
+        2: `#program 2\nimport seaborn as sns\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import fetch_california_housing\n\ndf = fetch_california_housing(as_frame=True).frame\ncorr = df.corr()\n\nplt.figure(figsize=(10, 8))\nsns.heatmap(corr, annot=True, cmap=&#x27;coolwarm&#x27;, fmt=&#x27;.2f&#x27;)\nplt.show()\n\nsns.pairplot(df)\nplt.show()`,
+        3: `#program 3\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_iris\nfrom sklearn.decomposition import PCA\n\niris = load_iris()\nX, y = iris.data, iris.target\npca = PCA(n_components=2)\nX2 = pca.fit_transform(X)\n\ncolors = [&#x27;r&#x27;, &#x27;g&#x27;, &#x27;b&#x27;]\nfor i in np.unique(y):\n    plt.scatter(X2[y == i, 0], X2[y == i, 1], color=colors[i], label=iris.target_names[i])\n\nplt.xlabel(&quot;PC1&quot;)\nplt.ylabel(&quot;PC2&quot;)\nplt.title(&quot;PCA on Iris&quot;)\nplt.legend()\nplt.show()`,
+        4: `#program 4\nimport pandas as pd\n\ndata = pd.read_csv(&quot;training_data.csv&quot;)\na = data.columns[:-1]\nc = data.columns[-1]\nh = [&#x27;?&#x27; for _ in a]\n\nfor _, row in data.iterrows():\n    if row[c] == &#x27;Yes&#x27;:\n        for i, v in enumerate(row[a]):\n            if h[i] == &#x27;?&#x27; or h[i] == v:\n                h[i] = v\n            else:\n                h[i] = &#x27;?&#x27;\n\nprint(&quot;Final hypothesis:&quot;, h)`,
+        5: `#program 5\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom collections import Counter\n\ndata = np.random.rand(100)\ntrain, test = data[:50], data[50:]\nlabels = [&quot;Class1&quot; if x &lt;= 0.5 else &quot;Class2&quot; for x in train]\n\ndef knn(x, k):\n    d = [(abs(x - train[i]), labels[i]) for i in range(len(train))]\n    d.sort()\n    return Counter([j for _, j in d[:k]]).most_common(1)[0][0]\n\nfor k in [1, 2, 3, 4, 5, 20, 30]:\n    pred = [knn(x, k) for x in test]\n    print(&quot;k =&quot;, k, pred)\n\n    c1 = [test[i] for i in range(len(test)) if pred[i] == &quot;Class1&quot;]\n    c2 = [test[i] for i in range(len(test)) if pred[i] == &quot;Class2&quot;]\n\n    plt.scatter(train, [0]*len(train), c=[&#x27;blue&#x27; if x == &quot;Class1&quot; else &#x27;red&#x27; for x in labels])\n    plt.scatter(c1, [1]*len(c1), c=&#x27;blue&#x27;, marker=&#x27;x&#x27;)\n    plt.scatter(c2, [1]*len(c2), c=&#x27;red&#x27;, marker=&#x27;x&#x27;)\n    plt.title(f&quot;k = {k}&quot;)\n    plt.show()`,
+        6: `#6th program\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nx = np.linspace(0, 2*np.pi, 100)\ny = np.sin(x) + 0.1*np.random.randn(100)\n\ndef lwr(xq, X, Y, tau=0.5):\n    w = np.exp(-(X - xq)**2 / (2*tau*tau))\n    Xb = np.c_[np.ones(len(X)), X]\n    W = np.diag(w)\n    theta = np.linalg.pinv(Xb.T @ W @ Xb) @ Xb.T @ W @ Y\n    return np.array([1, xq]) @ theta\n\nxt = np.linspace(0, 2*np.pi, 200)\nyp = [lwr(i, x, y) for i in xt]\n\nplt.scatter(x, y, s=10)\nplt.plot(xt, yp, &#x27;r&#x27;)\nplt.show()`,
+        7: `#program 7\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import fetch_california_housing\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.preprocessing import PolynomialFeatures\nfrom sklearn.pipeline import make_pipeline\n\ndf = fetch_california_housing(as_frame=True).frame\nX = df[[&#x27;AveRooms&#x27;]]\ny = df[&#x27;MedHouseVal&#x27;]\n\nXtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)\n\nlr = LinearRegression()\nlr.fit(Xtr, ytr)\nyp1 = lr.predict(Xte)\n\nplt.scatter(Xte, yte, color=&#x27;blue&#x27;, label=&#x27;Actual&#x27;)\nplt.scatter(Xte, yp1, color=&#x27;red&#x27;, label=&#x27;Predicted&#x27;)\nplt.title(&quot;Linear Regression&quot;)\nplt.legend()\nplt.show()\n\npr = make_pipeline(PolynomialFeatures(2), LinearRegression())\npr.fit(Xtr, ytr)\nyp2 = pr.predict(Xte)\n\nplt.scatter(Xte, yte, color=&#x27;blue&#x27;, label=&#x27;Actual&#x27;)\nplt.scatter(Xte, yp2, color=&#x27;red&#x27;, label=&#x27;Predicted&#x27;)\nplt.title(&quot;Polynomial Regression&quot;)\nplt.legend()\nplt.show()\n\nprint(&quot;Linear R2 =&quot;, lr.score(Xte, yte))\nprint(&quot;Polynomial R2 =&quot;, pr.score(Xte, yte))`,
+        8: `#program 8\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_breast_cancer\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.tree import DecisionTreeClassifier, plot_tree\nfrom sklearn.metrics import accuracy_score\n\ndata = load_breast_cancer()\nX, y = data.data, data.target\n\nXtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)\n\nmodel = DecisionTreeClassifier(random_state=42)\nmodel.fit(Xtr, ytr)\nyp = model.predict(Xte)\n\nprint(&quot;Accuracy =&quot;, accuracy_score(yte, yp))\nprint(&quot;Predicted class =&quot;, model.predict([Xte[0]])[0])\n\nplt.figure(figsize=(10, 6))\nplot_tree(model, filled=True)\nplt.show()`,
+        9: `#program 9\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import fetch_olivetti_faces\nfrom sklearn.model_selection import train_test_split, cross_val_score\nfrom sklearn.naive_bayes import GaussianNB\nfrom sklearn.metrics import accuracy_score, classification_report, confusion_matrix\n\ndata = fetch_olivetti_faces(shuffle=True, random_state=42)\nX, y = data.data, data.target\n\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.3, random_state=42\n)\n\ngnb = GaussianNB()\ngnb.fit(X_train, y_train)\ny_pred = gnb.predict(X_test)\n\nprint(f&quot;Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%&quot;)\nprint(&quot;\nClassification Report:&quot;)\nprint(classification_report(y_test, y_pred, zero_division=1))\nprint(&quot;\nConfusion Matrix:&quot;)\nprint(confusion_matrix(y_test, y_pred))\n\ncv = cross_val_score(gnb, X, y, cv=5, scoring=&#x27;accuracy&#x27;)\nprint(f&quot;\nCross-validation accuracy: {cv.mean() * 100:.2f}%&quot;)\n\nfig, axes = plt.subplots(3, 5, figsize=(12, 8))\nfor ax, image, label, pred in zip(axes.ravel(), X_test, y_test, y_pred):\n    ax.imshow(image.reshape(64, 64), cmap=plt.cm.gray)\n    ax.set_title(f&quot;True: {label}, Pred: {pred}&quot;)\n    ax.axis(&#x27;off&#x27;)\nplt.tight_layout()\nplt.show()`,
+        10: `#program 10\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import load_breast_cancer\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.decomposition import PCA\n\ndata = load_breast_cancer()\nX, y = data.data, data.target\n\nX = StandardScaler().fit_transform(X)\nk = KMeans(n_clusters=2, random_state=42)\nc = k.fit_predict(X)\n\npca = PCA(n_components=2)\nX2 = pca.fit_transform(X)\n\ndf = pd.DataFrame(X2, columns=[&#x27;PC1&#x27;, &#x27;PC2&#x27;])\ndf[&#x27;Cluster&#x27;] = c\n\nplt.scatter(df[&#x27;PC1&#x27;], df[&#x27;PC2&#x27;], c=df[&#x27;Cluster&#x27;], cmap=&#x27;Set1&#x27;)\nplt.scatter(*pca.transform(k.cluster_centers_).T, c=&#x27;black&#x27;, marker=&#x27;X&#x27;, s=200)\nplt.show()`,
+      };
+      function showProg(n) {
+        document.getElementById("code").innerHTML = programs[n];
+        current = n;
+      }
+      let current = 1;
+      showProg(1);
+      function copyCode() {
+        const t = document.getElementById("code").textContent;
+        navigator.clipboard.writeText(t).then(() => {
+          const b = document.querySelector(".copy");
+          b.textContent = "✓ Copied";
+          setTimeout(() => (b.textContent = "📋 Copy"), 1200);
+        });
+      }
+    </script>
+  </body>
+</html>
